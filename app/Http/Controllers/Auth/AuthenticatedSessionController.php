@@ -49,4 +49,16 @@ class AuthenticatedSessionController extends Controller
 
         return redirect('/');
     }
+    protected function authenticated(Request $request, $user)
+    {
+        if ($user->is_admin) {
+            return response()->json([
+                'redirect' => route('admin.dashboard'), // Отправляем URL для перенаправления
+            ]);
+        }
+
+        return response()->json([
+            'redirect' => route('dashboard'), // Стандартный редирект для обычных пользователей
+        ]);
+    }
 }

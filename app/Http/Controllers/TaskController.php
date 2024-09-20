@@ -47,13 +47,44 @@ class TaskController extends Controller
 
     }
 
-
-    public function showTaskForUser()
+    public function edit($id)
     {
-        $user = auth()->user();
-        $task = Task::where('user_id',$user->id)->get();
-        $notifications = $user->notifications;
+        $task = Task::findOrFail($id);
 
-        return inertia('Task/AddTask');
+        return response()->json($task);
+    }
+    public function update(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'priority' => 'required|in:low,medium,high',
+            'status' => 'required|in:pending,in-progress,completed',
+            'end_date' => 'required|date',
+        ]);
+
+        $task = Task::findOrFail($id);
+
+        $task->update($validatedData);
+
+        return response()->json(['massage'=> 'Задача обновлена']);
+    }
+
+
+//    public function showTaskForUser()
+//    {
+//        $user = auth()->user();
+//        $task = Task::where('user_id',$user->id)->get();
+//        $notifications = $user->notifications;
+//
+//        return inertia('Task/AddTask');
+//    }
+
+    public function destroy($id)
+    {
+        $task = Task::findOrFail($id);
+        $task->delete();
+
+        return response()->json("Deleted");
     }
 }

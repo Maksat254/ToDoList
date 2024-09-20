@@ -1,9 +1,11 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
+import {useRoute} from "vue-router";
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { Link } from '@inertiajs/vue3';
 import axios from 'axios';
+
 
 const tasks = ref([]);
 const search = ref('');
@@ -12,6 +14,9 @@ const selectedPriority = ref('');
 const selectedStatus = ref('');
 const notifications = ref([]);
 const showCreateTaskModal = ref(false);
+const showEditTaskModal = ref(false);
+const taskForEdit = ref({});
+
 
 const fetchTasks = async () => {
     try {
@@ -39,12 +44,31 @@ const filteredTasks = computed(() => {
 
 const editTask = (task) => {
     console.log('Edit task', task);
+    taskForEdit.value = {...task}
+    showEditTaskModal.value = true;
 };
 
-const deleteTask = (taskId) => {
-    console.log('Delete task', taskId);
+const updateTask = async () => {
+    try {
+        const response = await axios.put(`/tasks/${editTaskForm.value.id}`, editTaskForm.value);
+        console.log('Task updated:', response.data);
+        closeEditTask();
+        await fetchTasks(); // Обновляем список задач
+    } catch (error) {
+        console.error('Ошибка при обновлении задачи:', error);
+    }
 };
 
+
+const deleteTask = async (taskId) => {
+    if (!confirm("НЕ СМЕЙ УДАЛЯТЬ")) return;
+    try {
+        await axios.delete(`/tasks/${taskId}`);
+        await fetchTasks();
+    } catch (error) {
+        console.error('Ошибка при удалении задачи:', error);
+    }
+};
 onMounted(async () => {
     await fetchTasks();
 });
@@ -64,7 +88,7 @@ onMounted(async () => {
             </div>
 
             <div class="mb-4">
-                <input v-model="search" type="text" placeholder="Search tasks..." class="p-2 border border-gray-300 rounded w-full" />
+                <input v-model="search" type="text" placeholder="Поиск задачи..." class="p-2 border border-gray-300 rounded w-full" />
             </div>
 
             <div class="mb-4">
@@ -114,7 +138,8 @@ onMounted(async () => {
                         <td class="p-2">{{ task.end_date }}</td>
                         <td class="p-2">{{ task.user_id }}</td>
                         <td class="p-2">
-                            <button @click="editTask(task)" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
+                            <router-link :to="{name:'edit_url', params:{id:task.id}}">Edit</router-link>
+<!--                            <button @click="editTask(task)" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>-->
                             <button @click="deleteTask(task.id)" class="bg-red-500 text-white px-2 py-1 rounded ml-2">Delete</button>
                         </td>
                     </tr>

@@ -116,8 +116,8 @@ const task = ref({
     description: '',
     start_date: '',
     end_date: '',
-    priority: 'low',
-    status: 'new',
+    priority: '',
+    status: '',
     users_id: ''
 });
 
@@ -133,8 +133,8 @@ const submitForm = async () => {
             description: '',
             start_date: '',
             end_date: '',
-            priority: 'low',
-            status: 'new',
+            priority: '',
+            status: '',
             users_id: ''
         };
         console.log(response.data);
