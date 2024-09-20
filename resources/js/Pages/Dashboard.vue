@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import {useRoute} from "vue-router";
+import { useRoute, RouterLink } from 'vue-router';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { Link } from '@inertiajs/vue3';
@@ -44,15 +44,15 @@ const filteredTasks = computed(() => {
 
 const editTask = (task) => {
     console.log('Edit task', task);
-    taskForEdit.value = {...task}
-    showEditTaskModal.value = true;
+    taskForEdit.value = { ...task }; // Копируем задачу для редактирования
+    showEditTaskModal.value = true; // Показываем модал для редактирования
 };
 
 const updateTask = async () => {
     try {
-        const response = await axios.put(`/tasks/${editTaskForm.value.id}`, editTaskForm.value);
+        const response = await axios.put(`/tasks/${taskForEdit.value.id}`, taskForEdit.value);
         console.log('Task updated:', response.data);
-        closeEditTask();
+        closeEditTask(); // Закрываем модал
         await fetchTasks(); // Обновляем список задач
     } catch (error) {
         console.error('Ошибка при обновлении задачи:', error);
@@ -138,8 +138,9 @@ onMounted(async () => {
                         <td class="p-2">{{ task.end_date }}</td>
                         <td class="p-2">{{ task.user_id }}</td>
                         <td class="p-2">
-                            <router-link :to="{name:'edit_url', params:{id:task.id}}">Edit</router-link>
-<!--                            <button @click="editTask(task)" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>-->
+<!--                            <router-link :to="{ name: 'edit_url', params: { id: task.id } }" class="bg-blue-500 text-white px-2 py-1 rounded ml-2">-->
+<!--                                Edit-->
+<!--                            </router-link>-->
                             <button @click="deleteTask(task.id)" class="bg-red-500 text-white px-2 py-1 rounded ml-2">Delete</button>
                         </td>
                     </tr>
